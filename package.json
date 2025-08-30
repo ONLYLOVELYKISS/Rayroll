@@ -1,0 +1,25 @@
+{
+  "name": "payroll-analysis-project",
+  "version": "5.1.0",
+  "description": "个人工资统计分析应用",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "package": "pkg . --targets node16-win-x64 --output dist/薪酬罗盘.exe"
+  },
+  "keywords": [],
+  "author": "GitHub/MrKangHI",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  },
+  "bin": "server.prod.js",
+  "pkg": {
+    "assets": [
+      "public/**/*"
+    ]
+  }
+}

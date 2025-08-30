@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人工资统计分析 (智能识别版)</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+    <div class="background-gradient"></div>
+    <nav class="navbar"><div class="navbar-content"><h1>个人工资统计分析 (智能识别版)</h1></div></nav>
+    <main class="container">
+        <section class="card floating-card">
+            <h2 class="card-title"><i data-feather="upload-cloud"></i> 上传工资单</h2>
+            <div class="form-group">
+                <label for="file-input" class="file-label"><span id="file-name-display">点击选择 Excel 文件</span></label>
+                <input type="file" id="file-input" multiple accept=".xlsx, .xls, .xlsb, .xlsm">
+            </div>
+            <button id="upload-button" class="button-primary"><i data-feather="bar-chart-2"></i> 上传并分析</button>
+            <p id="status-message"></p>
+        </section>
+        <section class="card floating-card">
+            <div class="card-header">
+                <h2 class="card-title"><i data-feather="pie-chart"></i> 数据洞察</h2>
+                <div class="insights-controls">
+                    <div id="view-mode-group" class="control-group">
+                        <button class="control-button active" data-view="all" title="总览"><i data-feather="globe"></i></button>
+                        <button class="control-button" data-view="year" title="按年查看"><i data-feather="calendar"></i></button>
+                        <button class="control-button" data-view="month" title="按月查看"><i data-feather="file-text"></i></button>
+                    </div>
+                    <div id="filter-select-group" class="filter-select-container">
+                        <select id="year-select" class="filter-select" style="display: none;"></select>
+                        <select id="month-select" class="filter-select" style="display: none;"></select>
+                    </div>
+                    <div id="chart-type-group" class="control-group">
+                        <button class="control-button active" data-chart="bar" title="趋势图"><i data-feather="bar-chart"></i></button>
+                        <button class="control-button" data-chart="pie" title="构成图"><i data-feather="pie-chart"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div id="chart-container" class="chart-container"></div>
+        </section>
+        <section class="card floating-card">
+            <h2 class="card-title"><i data-feather="database"></i> 详细数据</h2>
+            <div id="full-data-display"></div>
+            <div id="pagination-controls" class="pagination-controls"></div>
+        </section>
+        <footer class="footer">
+            <button id="clear-data-button" class="button-danger"><i data-feather="trash-2"></i> 清空所有数据</button>
+        </footer>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
