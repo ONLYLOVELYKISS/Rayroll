@@ -1,57 +1,112 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人工资统计分析 (智能识别版)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#101215">
+    <meta name="color-scheme" content="dark light">
+    <title>薪澈 · 本地工资分析</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="vendor/feather.min.js"></script>
 </head>
 <body>
-    <div class="background-gradient"></div>
-    <nav class="navbar"><div class="navbar-content"><h1>个人工资统计分析 (智能识别版)</h1></div></nav>
-    <main class="container">
-        <section class="card floating-card">
-            <h2 class="card-title"><i data-feather="upload-cloud"></i> 上传工资单</h2>
-            <div class="form-group">
-                <label for="file-input" class="file-label"><span id="file-name-display">点击选择 Excel 文件</span></label>
-                <input type="file" id="file-input" multiple accept=".xlsx, .xls, .xlsb, .xlsm">
-            </div>
-            <button id="upload-button" class="button-primary"><i data-feather="bar-chart-2"></i> 上传并分析</button>
-            <p id="status-message"></p>
-        </section>
-        <section class="card floating-card">
-            <div class="card-header">
-                <h2 class="card-title"><i data-feather="pie-chart"></i> 数据洞察</h2>
-                <div class="insights-controls">
-                    <div id="view-mode-group" class="control-group">
-                        <button class="control-button active" data-view="all" title="总览"><i data-feather="globe"></i></button>
-                        <button class="control-button" data-view="year" title="按年查看"><i data-feather="calendar"></i></button>
-                        <button class="control-button" data-view="month" title="按月查看"><i data-feather="file-text"></i></button>
-                    </div>
-                    <div id="filter-select-group" class="filter-select-container">
-                        <select id="year-select" class="filter-select" style="display: none;"></select>
-                        <select id="month-select" class="filter-select" style="display: none;"></select>
-                    </div>
-                    <div id="chart-type-group" class="control-group">
-                        <button class="control-button active" data-chart="bar" title="趋势图"><i data-feather="bar-chart"></i></button>
-                        <button class="control-button" data-chart="pie" title="构成图"><i data-feather="pie-chart"></i></button>
-                    </div>
+    <div class="ambient" aria-hidden="true"><span></span><span></span></div>
+    <main class="app-shell">
+        <header class="topbar">
+            <a class="brand" href="#home" aria-label="薪澈首页"><span class="brand-mark"><img src="img/logo-original.png" alt="" width="34" height="34"></span><span>薪澈<small>本地工资分析</small></span></a>
+            <button id="settings-button" class="icon-button glass" aria-label="设置"><i data-feather="sliders"></i></button>
+        </header>
+        <aside id="error-toast" class="error-toast" role="alert" aria-live="assertive" hidden><span><strong id="error-title">遇到一点问题</strong><small id="error-detail">本机数据仍在此设备，请重试。</small></span><button id="error-reload" type="button">重新加载</button><button id="error-dismiss" class="icon-button" type="button" aria-label="关闭提示">×</button></aside>
+
+        <section id="home-view" class="view active" aria-labelledby="welcome-title">
+            <div class="hero-heading"><div><span class="eyebrow">PAYROLL OVERVIEW</span><h1 id="welcome-title">工资，<span>一目了然。</span></h1><p>本地分析 · 数据仅保存在此设备</p></div><div class="hero-emblem" aria-hidden="true"><img src="img/logo-original.png" alt="" width="68" height="68"></div></div>
+            <section class="summary-card" aria-label="工资概览">
+                <div class="summary-top"><span id="summary-period">全部月份 · 实发合计</span><span class="live-dot">本机数据</span></div>
+                <strong id="hero-net">¥ 0.00</strong>
+                <div class="summary-divider"></div>
+                <div class="summary-stats"><div><span>应发合计</span><strong id="hero-gross">¥ 0.00</strong></div><div><span>工资记录</span><strong id="hero-records">0 条</strong></div><div><span>工资月份</span><strong id="hero-people">0 个月</strong></div></div>
+                <div class="summary-glint" aria-hidden="true"></div>
+            </section>
+
+            <section class="section-block import-block">
+                <div class="section-heading"><div><span class="eyebrow">SMART IMPORT</span><h2>识别工资单</h2></div><span class="offline-pill"><i data-feather="shield"></i> 离线识别</span></div>
+                <div class="import-grid">
+                    <label class="import-tile" for="file-input"><span class="tile-icon excel"><i data-feather="grid"></i></span><strong>Excel 表格</strong><small>多工作表 · 表头自动匹配</small><span class="tile-arrow"><i data-feather="arrow-up-right"></i></span></label>
+                    <label class="import-tile" for="image-input"><span class="tile-icon scan"><i data-feather="scan-line"></i></span><strong>图片 / 截图</strong><small>打开系统相册 · 选中即识别</small><span class="tile-arrow"><i data-feather="arrow-up-right"></i></span></label>
                 </div>
-            </div>
-            <div id="chart-container" class="chart-container"></div>
+                <input type="file" id="file-input" multiple accept=".xlsx,.xls,.xlsb,.xlsm,.csv">
+                <input type="file" id="image-input" accept="image/*">
+                <button id="upload-button" class="button-primary"><i data-feather="scan"></i> 开始识别</button>
+                <button id="manual-entry-button" class="button-secondary"><i data-feather="edit-3"></i> 手动录入工资条</button>
+                <p id="file-name-display" class="file-name-display">选择 Excel 文件后开始识别</p>
+                <div id="status-panel" class="status-panel" role="status" aria-live="polite"><span id="status-indicator"></span><p id="status-message">选择 Excel 或工资单图片开始</p></div>
+            </section>
+
+            <section class="section-block recent-block">
+                <div class="section-heading"><div><span class="eyebrow">RECENT ACTIVITY</span><h2>最近工资</h2></div><button class="text-button" data-goto="records">查看全部 <i data-feather="arrow-right"></i></button></div>
+                <div id="recent-records" class="recent-list"></div>
+            </section>
         </section>
-        <section class="card floating-card">
-            <h2 class="card-title"><i data-feather="database"></i> 详细数据</h2>
-            <div id="full-data-display"></div>
+
+        <section id="budget-view" class="view" aria-labelledby="budget-title">
+            <div class="page-heading"><span class="eyebrow">MONTHLY RECONCILIATION</span><h1 id="budget-title">每日花销</h1><p>按本人所选月份的实发工资，核销当月实际花销</p></div>
+            <section class="budget-panel glass">
+                <div class="budget-selectors"><label>本人档案<select id="budget-employee" class="filter-select"></select></label><div class="budget-month-control"><button id="budget-month-prev" class="icon-button glass" type="button" aria-label="上一个月">‹</button><label>月份<select id="budget-month" class="filter-select"></select></label><button id="budget-month-next" class="icon-button glass" type="button" aria-label="下一个月">›</button></div></div>
+                <div class="budget-income"><span id="budget-income-label">当月实发工资</span><strong id="budget-income">¥ 0.00</strong><small id="budget-source-note">选择本人工资档案和月份查看实际收支</small></div>
+                <div class="budget-progress"><span id="budget-progress-fill"></span></div>
+                <div class="budget-summary"><div><span>已记花销</span><strong id="budget-spent">¥ 0.00</strong></div><div><span>本月结余</span><strong id="budget-remaining">¥ 0.00</strong></div></div>
+                <div class="daily-guidance"><div><span>已过天数日均</span><strong id="expense-daily-average">—</strong></div><div><span>剩余日均可用</span><strong id="expense-daily-allowance">—</strong></div></div>
+            </section>
+            <section class="section-block"><div class="section-heading"><div><span class="eyebrow">QUICK ENTRY</span><h2>记一笔花销</h2></div><span class="offline-pill"><i data-feather="shield"></i> 仅本机</span></div>
+                <div id="expense-quick-categories" class="quick-category-list" aria-label="常用花销类别"></div>
+                <form id="expense-form" class="expense-form">
+                    <input id="expense-edit-id" type="hidden"><label>日期<input id="expense-date" type="date" required></label>
+                    <label>类别<input id="expense-category" list="expense-categories" placeholder="如：餐饮" maxlength="30" required><datalist id="expense-categories"></datalist></label>
+                    <label>金额<input id="expense-amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" required></label>
+                    <label class="expense-note-label">备注（可选）<input id="expense-note" type="text" maxlength="80" placeholder="例如：午餐"></label>
+                    <button id="expense-submit" class="button-primary" type="submit"><i data-feather="plus"></i> <span id="expense-submit-label">保存花销</span></button>
+                </form>
+            </section>
+            <section class="section-block"><div class="section-heading"><div><span class="eyebrow">THIS MONTH</span><h2>分类汇总</h2></div><span id="expense-total-share" class="record-count"></span></div><div id="expense-categories-summary" class="expense-categories-summary"></div></section>
+            <section class="section-block"><div class="section-heading"><div><span class="eyebrow">LEDGER</span><h2>当月明细</h2></div><span id="expense-count" class="record-count"></span></div><div id="expense-list" class="expense-list"></div></section>
+        </section>
+
+        <section id="insights-view" class="view" aria-labelledby="insights-title">
+            <div class="page-heading"><span class="eyebrow">TRENDS & INSIGHTS</span><h1 id="insights-title">收入趋势</h1><p>按年或月份查看工资变化</p></div>
+            <div class="filter-toolbar glass">
+                <label class="insight-profile-label">个人档案<select id="insight-employee" class="filter-select"></select></label>
+                <div id="view-mode-group" class="segmented-control"><button class="control-button active" data-view="all">全部</button><button class="control-button" data-view="year">按年</button><button class="control-button" data-view="month">按月</button></div>
+                <div class="filter-select-container"><select id="year-select" class="filter-select" style="display:none"></select><select id="month-select" class="filter-select" style="display:none"></select></div>
+            </div>
+            <section class="chart-panel"><div class="chart-panel-heading"><div><span class="eyebrow">SALARY MOVEMENT</span><h2>收支走势</h2></div><div id="chart-type-group" class="chart-switch"><button class="control-button active" data-chart="bar" aria-label="柱状图"><i data-feather="bar-chart-2"></i></button><button class="control-button" data-chart="pie" aria-label="构成图"><i data-feather="pie-chart"></i></button></div></div><div id="chart-container" class="chart-container"></div></section>
+            <section class="metric-grid income-metrics"><article class="metric-card"><span class="metric-dot gross"></span><span>应发合计</span><strong id="insight-gross">¥ 0.00</strong></article><article class="metric-card"><span class="metric-dot net"></span><span>实发合计</span><strong id="insight-net">¥ 0.00</strong></article><article class="metric-card"><span class="metric-dot deduction"></span><span>扣款合计 / 扣款率</span><strong id="insight-deduction">¥ 0.00</strong><small id="insight-deduction-rate">—</small></article><article class="metric-card"><span class="metric-dot net"></span><span>实发率</span><strong id="insight-net-rate">—</strong></article><article class="metric-card"><span>有记录月份均值</span><strong id="insight-average">—</strong></article><article class="metric-card"><span>有记录月份中位数</span><strong id="insight-median">—</strong></article><article class="metric-card"><span>较上个连续月份</span><strong id="insight-change">—</strong></article></section>
+            <p id="insight-method" class="method-note">统计本人已记录的工资月份；缺失月份不按 0 元计算。均值与中位数基于每个有记录月份的实发工资。</p>
+        </section>
+
+        <section id="records-view" class="view" aria-labelledby="records-title">
+            <div class="page-heading"><span class="eyebrow">PAYROLL RECORDS</span><h1 id="records-title">工资明细</h1><p>按姓名档案查看个人每月收入与扣款</p></div>
+            <label class="search-bar glass"><i data-feather="search"></i><input id="record-search" type="search" placeholder="搜索本人档案" autocomplete="off"></label>
+            <label class="record-profile-label">本人档案<select id="record-employee" class="filter-select"></select></label>
+            <section id="salary-profile-summary" class="salary-profile-summary glass"></section>
+            <div id="full-data-display" class="records-list"></div>
             <div id="pagination-controls" class="pagination-controls"></div>
         </section>
-        <footer class="footer">
-            <button id="clear-data-button" class="button-danger"><i data-feather="trash-2"></i> 清空所有数据</button>
-        </footer>
+
+        <nav class="bottom-nav glass" aria-label="主导航">
+            <button class="nav-item active" data-tab="home"><i data-feather="home"></i><span>概览</span></button>
+            <button class="nav-item" data-tab="insights"><i data-feather="activity"></i><span>趋势</span></button>
+            <button class="nav-item" data-tab="records"><i data-feather="layers"></i><span>明细</span></button>
+            <button class="nav-item" data-tab="budget"><i data-feather="credit-card"></i><span>花销</span></button>
+        </nav>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+
+    <dialog id="review-dialog" class="review-dialog"><form method="dialog"><div class="dialog-heading"><span class="eyebrow">REVIEW BEFORE IMPORT</span><button class="icon-button glass" value="cancel" aria-label="关闭"><i data-feather="x"></i></button><h2>核对识别结果</h2><p id="review-summary">检查识别字段后再保存</p></div><div id="review-records" class="review-records"></div><div class="dialog-actions"><button class="button-secondary" value="cancel">重新识别</button><button id="confirm-import" class="button-primary" value="confirm"><i data-feather="check"></i> 确认并保存</button></div></form></dialog>
+    <dialog id="manual-record-dialog" class="review-dialog"><form id="manual-record-form" method="dialog"><div class="dialog-heading"><span class="eyebrow">MANUAL PAYROLL ENTRY</span><button class="icon-button glass" value="cancel" aria-label="关闭"><i data-feather="x"></i></button><h2>手动录入工资条</h2><p>录入个人工资条；收入和扣款会自动汇总。</p></div><div class="manual-record-fields"><label>公司 / 单位<input id="manual-employer" list="employer-options" maxlength="60" placeholder="可选"></label><datalist id="employer-options"></datalist><label>员工姓名<input id="manual-name" maxlength="50" required></label><label>工资月份<input id="manual-month" type="month" required></label><label>部门（可选）<input id="manual-department" maxlength="60"></label></div><div class="manual-items-heading"><strong>工资项目</strong><button id="add-manual-item" class="text-button" type="button">＋ 添加项目</button></div><datalist id="pay-item-options"></datalist><div id="manual-item-rows" class="manual-item-rows"></div><div class="manual-totals"><span>应发 <strong id="manual-gross-total">¥ 0.00</strong></span><span>扣款 <strong id="manual-deduction-total">¥ 0.00</strong></span><span>实发 <strong id="manual-net-total">¥ 0.00</strong></span></div><div class="dialog-actions"><button class="button-secondary" value="cancel">取消</button><button class="button-primary" id="save-manual-record" value="save">保存工资条</button></div></form></dialog>
+    <dialog id="settings-dialog" class="review-dialog settings-dialog"><form method="dialog"><div class="dialog-heading"><span class="eyebrow">LOCAL DATA</span><button class="icon-button glass" value="cancel" aria-label="关闭"><i data-feather="x"></i></button><h2>显示与数据</h2><p>工资和花销仅保存在本机。显示主题可手动固定，也可跟随手机系统设置。</p></div><label class="theme-setting">外观主题<select id="theme-mode" class="filter-select"><option value="system">跟随手机系统</option><option value="light">浅色</option><option value="dark">深色</option></select></label><a class="license-link" href="privacy.html">查看隐私说明</a><a class="license-link" href="licenses.html">查看第三方开源许可</a><div class="pay-item-manager"><strong>本人工资项目模板</strong><small>可按任职单位区分不同工资项目及收 / 扣款类型。</small><div class="pay-item-manager-row"><input id="pay-item-employer" maxlength="60" placeholder="任职单位（可选）"><input id="pay-item-label" maxlength="40" placeholder="项目名称"><select id="pay-item-type"><option value="grossPay">收入</option><option value="deduction">扣款</option></select><button id="save-pay-item" type="button" class="button-secondary">添加</button></div><p id="pay-item-status" class="form-status" aria-live="polite"></p><div id="pay-item-list" class="pay-item-list"></div></div><button id="clear-data-button" class="button-danger" type="button"><i data-feather="trash-2"></i> 清除本机全部数据</button></form></dialog>
+
+    <script src="vendor/xlsx.full.min.js"></script>
+    <script src="vendor/echarts.min.js"></script>
+    <script src="vendor/tesseract.min.js"></script>
     <script src="js/config.js"></script>
     <script src="js/main.js"></script>
 </body>

@@ -1,0 +1,8 @@
+{
+  "appId": "com.wwhooo.Skye.RayRoll",
+  "appName": "薪澈",
+  "webDir": "public",
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -3,7 +3,7 @@
 const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
-const crypto = require('crypto');
+const { createLocalCipher } = require('./storage-crypto');
 
 // --- 路径、加密、日志等配置 (保持不变) ---
 const appDataPath = process.env.LOCALAPPDATA || process.env.APPDATA;
@@ -11,13 +11,9 @@ if (!appDataPath) { process.exit(1); }
 const APP_DIR = path.join(appDataPath, 'SalaryCompass');
 const DATA_DIR = path.join(APP_DIR, 'data');
 const LOG_DIR = path.join(APP_DIR, 'logs');
-const ENCRYPTION_KEY = '12345678901234567890123456789012';
-const IV = '1234567890123456';
-const ALGORITHM = 'aes-256-cbc';
+const { encrypt, decrypt, isCurrentFormat } = createLocalCipher(APP_DIR);
 
 // --- 工具函数 (保持不变) ---
-const encrypt = (text) => { const cipher = crypto.createCipheriv(ALGORITHM, ENCRYPTION_KEY, IV); let encrypted = cipher.update(text, 'utf8', 'hex'); encrypted += cipher.final('hex'); return encrypted; };
-const decrypt = (encryptedText) => { const decipher = crypto.createDecipheriv(ALGORITHM, ENCRYPTION_KEY, IV); let decrypted = decipher.update(encryptedText, 'hex', 'utf8'); decrypted += decipher.final('utf8'); return decrypted; };
 const writeLog = async (message, level = 'info') => { const timestamp = new Date().toISOString(); const logMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}\n`; try { await fs.mkdir(LOG_DIR, { recursive: true }); await fs.appendFile(path.join(LOG_DIR, 'app.log'), logMessage); } catch (err) { console.error('写入日志文件失败:', err); } };
 const sanitizeFilename = (input) => String(input).replace(/[\\?%*|:"<>/\\]/g, '_');
 
@@ -32,7 +28,7 @@ const publicPath = path.join(__dirname, 'public');
 app.use(express.static(publicPath));
 
 // --- API 路由定义 (保持不变) ---
-app.get('/api/data', async (req, res) => { try { await fs.mkdir(DATA_DIR, { recursive: true }); const files = await fs.readdir(DATA_DIR); const jsonFiles = files.filter(file => file.endsWith('.json')); const allData = await Promise.all(jsonFiles.map(async file => { const filePath = path.join(DATA_DIR, file); try { const encryptedContent = await fs.readFile(filePath, 'utf8'); if (!encryptedContent) return null; const decryptedContent = decrypt(encryptedContent); return JSON.parse(decryptedContent); } catch (decryptError) { await writeLog(`文件 ${file} 解密或解析失败: ${decryptError.message}。`, 'warn'); return null; } })); res.json(allData.filter(item => item !== null)); } catch (error) { await writeLog(`读取数据目录失败: ${error.message}`, 'error'); res.status(500).send('获取数据失败'); } });
+app.get('/api/data', async (req, res) => { try { await fs.mkdir(DATA_DIR, { recursive: true }); const files = await fs.readdir(DATA_DIR); const jsonFiles = files.filter(file => file.endsWith('.json')); const allData = await Promise.all(jsonFiles.map(async file => { const filePath = path.join(DATA_DIR, file); try { const encryptedContent = await fs.readFile(filePath, 'utf8'); if (!encryptedContent) return null; const decryptedContent = decrypt(encryptedContent); if (!isCurrentFormat(encryptedContent)) await fs.writeFile(filePath, encrypt(decryptedContent), 'utf8'); return JSON.parse(decryptedContent); } catch (decryptError) { await writeLog(`文件 ${file} 解密或解析失败: ${decryptError.message}。`, 'warn'); return null; } })); res.json(allData.filter(item => item !== null)); } catch (error) { await writeLog(`读取数据目录失败: ${error.message}`, 'error'); res.status(500).send('获取数据失败'); } });
 app.post('/api/save-records', async (req, res) => {
     const records = req.body;
     if (!Array.isArray(records)) return res.status(400).send('请求体必须是一个数组');
@@ -70,7 +66,7 @@ app.post('/api/save-records', async (req, res) => {
 app.post('/api/clear-all', async (req, res) => { await writeLog('收到清空所有数据的请求...', 'warn'); try { await fs.rm(DATA_DIR, { recursive: true, force: true }); await writeLog('数据目录已清空。', 'success'); res.status(200).send('所有数据已清除'); } catch (error) { console.error(error); await writeLog(`清空数据时发生错误: ${error.stack}`, 'error'); res.status(500).send('清空数据失败'); } });
 
 // --- 启动服务器 (保持不变) ---
-app.listen(PORT, async () => {
+app.listen(PORT, '127.0.0.1', async () => {
     try {
         await fs.mkdir(DATA_DIR, { recursive: true });
         await writeLog('服务器启动成功 (生产模式)。');

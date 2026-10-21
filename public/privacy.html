@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>隐私说明 · 薪澈</title>
+  <style>
+    body{max-width:760px;margin:0 auto;padding:24px 20px 64px;background:#090b0f;color:#f4f5f6;font:15px/1.7 system-ui,"Noto Sans SC",sans-serif}
+    a{color:#f0d59c}h1{font-size:26px}h2{margin-top:28px;font-size:18px}p,li{color:#c4c8ca}.notice{padding:14px;border:1px solid #45413a;border-radius:12px;background:#171817}
+  </style>
+</head>
+<body>
+  <p><a href="index.html">返回薪澈</a></p>
+  <h1>隐私说明</h1>
+  <p class="notice">此说明随本地测试版本提供。公开分发前，运营者须填写真实主体名称、联系渠道、适用地区和生效日期，并核实实际构建及数据流。</p>
+  <h2>数据处理</h2>
+  <p>工资表和工资单图片由应用在当前设备处理。识别出的员工姓名、部门、工资项目、工资月份及金额保存在当前应用环境的浏览器 IndexedDB 中；本应用不配置账号、云同步、广告或分析服务。Android 构建关闭系统应用数据备份。Android IndexedDB 内容未做应用层加密。</p>
+  <p>本机保存不等同于加密存储或绝对保密。拥有当前设备/操作系统账户访问权的人员可能访问应用数据。请启用设备锁，仅导入你有权处理的数据；共享设备使用后请删除工资记录。</p>
+  <h2>桌面浏览器版</h2>
+  <p>在本机桌面服务器地址打开时，首次运行可从同一服务器的本地接口导入旧版记录。桌面服务只绑定到 127.0.0.1，不向局域网监听。旧版桌面文件仍可用旧格式读取，并在读取时迁移到随机本机密钥和 AES-GCM 格式；新密钥保存在当前 Windows 用户的本机应用数据目录。此措施不能防止同一操作系统账户下的恶意软件读取工资数据。</p>
+  <h2>个人用途和月度花销</h2>
+  <p>本应用面向个人整理本人收到的工资条，不提供公司全员薪酬管理。可以为本人录入多个月工资记录，并按月份记录每日花销。每月结余只使用所选姓名档案在该月的实发工资减去该月花销；没有该月工资记录时显示“待录入”，不会拿其他月份工资代替。姓名档案用于避免导入表中其他人员的工资混入个人预算。</p>
+  <h2>保留和删除</h2>
+  <p>工资记录保留在本机，直到你在“数据与隐私”中选择清除，或清除应用/浏览器存储。删除后无法从本应用恢复。卸载应用或清理浏览器数据也可能移除本机记录；请自行管理你主动制作的备份。</p>
+  <h2>发布者联系信息</h2>
+  <p>发布主体及隐私联系渠道尚未登记。此版本供个人本地使用/评估；公开发布前应补齐并核对。</p>
+  <p><a href="licenses.html">第三方开源许可</a></p>
+</body>
+</html>
