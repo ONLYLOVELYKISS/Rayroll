@@ -206,6 +206,18 @@ body{background:radial-gradient(ellipse at 8% -12%,rgba(105,153,171,.12),transpa
 :root[data-theme="light"] .bottom-nav,:root:not([data-theme="dark"]) .bottom-nav{background:rgba(255,255,255,.92);border-color:var(--glass-edge);box-shadow:0 12px 32px rgba(35,65,76,.12),inset 0 1px #fff}
 :root[data-theme="light"] .nav-item.active,:root:not([data-theme="dark"]) .nav-item.active{background:#e3eef1;color:#326b79}
 :root[data-theme="light"] .quick-action,:root:not([data-theme="dark"]) .quick-action{background:linear-gradient(145deg,#568e99,#326d7a);color:#fff;border-color:#bad2d8;box-shadow:0 8px 20px rgba(50,109,122,.22),inset 0 1px rgba(255,255,255,.35)}
+
+/* Keep the reconciliation controls readable on narrow Android screens. */
+@media(max-width:520px){
+  .budget-selectors{grid-template-columns:minmax(0,1fr);gap:12px}
+  .budget-month-control{grid-template-columns:46px minmax(0,1fr) 46px;gap:8px}
+  .budget-month-control .icon-button{width:46px;min-height:46px;height:46px}
+  .budget-selectors .filter-select{height:46px;min-width:0;padding-inline:12px;font-size:16px;text-overflow:ellipsis}
+}
+:root[data-theme="light"] .budget-income strong,:root:not([data-theme="dark"]) .budget-income strong{color:#245f54}
+:root[data-theme="light"] .budget-income span,:root[data-theme="light"] .budget-income small,
+:root:not([data-theme="dark"]) .budget-income span,:root:not([data-theme="dark"]) .budget-income small{color:#586763}
+:root[data-theme="light"] .budget-selectors label,:root:not([data-theme="dark"]) .budget-selectors label{color:#596763}
 :root[data-theme="light"] .budget-summary>div,:root[data-theme="light"] .salary-detail-grid section,:root:not([data-theme="dark"]) .budget-summary>div,:root:not([data-theme="dark"]) .salary-detail-grid section{background:#f2f6f7}
 :root[data-theme="light"] .review-dialog,:root:not([data-theme="dark"]) .review-dialog{background:linear-gradient(160deg,#fff,#f0f4f5);color:var(--text)}
 :root[data-theme="light"] .review-dialog::backdrop,:root:not([data-theme="dark"]) .review-dialog::backdrop{background:rgba(24,43,51,.32)}
