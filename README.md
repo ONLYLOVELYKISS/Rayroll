@@ -1,12 +1,12 @@
 # 薪澈
 
-薪澈读取 Excel 工资表和工资单图片，在本机识别并分析应发、扣款和实发金额，展示月度或年度图表。
+薪澈读取个人 Excel 工资表和工资单图片，在本机识别并分析应发、扣款和实发金额，提供个人薪资、花销记录及月度预算。界面采用石墨蓝、雾青与柔金配色，支持跟随系统或手动切换深浅主题。
 
 ## Project review
 
 The original project is a Node.js/Express web app packaged as a Windows executable with `pkg`. It has no Android application or APK build configuration. The page also loaded Excel, chart, and icon libraries from public CDNs, so a WebView wrapper would not work reliably offline. Payroll records were stored by the Node server under the Windows user profile, which is not available to an Android app.
 
-This iteration adds a Capacitor Android app, bundles the web libraries with the app, and stores records in the device's IndexedDB. Existing records served by the desktop app are imported into IndexedDB on first load. APK records stay on that device and are not synchronized with the desktop app or cloud. The Android launcher name is **薪澈**, its application ID is `com.wwhooo.Skye.RayRoll`, and the current preview APK is `1.1.0` (version code `2`). The launcher and app header use the project's original `Kang.ico` artwork. The project is licensed under MIT; see `LICENSE` and the in-app third-party notices. The package remains private to npm.
+This iteration adds a Capacitor Android app, bundles the web libraries with the app, and stores records in the device's IndexedDB. Existing records served by the desktop app are imported into IndexedDB on first load. APK records stay on that device and are not synchronized with the desktop app or cloud. The Android launcher name is **薪澈**, its application ID is `com.wwhooo.Skye.RayRoll`, and the current preview APK is `1.3.0` (version code `4`). The launcher, app header and splash screens use a minimalist prism-and-R mark based on the first APK icon. The project is licensed under MIT; see `LICENSE` and the in-app third-party notices. The package remains private to npm.
 
 ## Build an Android APK
 

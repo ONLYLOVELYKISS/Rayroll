@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#101215">
+    <meta name="theme-color" content="#0d1116">
     <meta name="color-scheme" content="dark light">
     <title>薪澈 · 本地工资分析</title>
     <link rel="stylesheet" href="css/style.css">
@@ -13,18 +13,21 @@
     <div class="ambient" aria-hidden="true"><span></span><span></span></div>
     <main class="app-shell">
         <header class="topbar">
-            <a class="brand" href="#home" aria-label="薪澈首页"><span class="brand-mark"><img src="img/logo-original.png" alt="" width="34" height="34"></span><span>薪澈<small>本地工资分析</small></span></a>
+            <a class="brand" href="#home" aria-label="薪澈首页"><span class="brand-mark"><img src="img/logo-first-apk.svg" alt="" width="34" height="34"></span><span>薪澈<small>本地工资分析</small></span></a>
             <button id="settings-button" class="icon-button glass" aria-label="设置"><i data-feather="sliders"></i></button>
         </header>
         <aside id="error-toast" class="error-toast" role="alert" aria-live="assertive" hidden><span><strong id="error-title">遇到一点问题</strong><small id="error-detail">本机数据仍在此设备，请重试。</small></span><button id="error-reload" type="button">重新加载</button><button id="error-dismiss" class="icon-button" type="button" aria-label="关闭提示">×</button></aside>
 
         <section id="home-view" class="view active" aria-labelledby="welcome-title">
-            <div class="hero-heading"><div><span class="eyebrow">PAYROLL OVERVIEW</span><h1 id="welcome-title">工资，<span>一目了然。</span></h1><p>本地分析 · 数据仅保存在此设备</p></div><div class="hero-emblem" aria-hidden="true"><img src="img/logo-original.png" alt="" width="68" height="68"></div></div>
-            <section class="summary-card" aria-label="工资概览">
-                <div class="summary-top"><span id="summary-period">全部月份 · 实发合计</span><span class="live-dot">本机数据</span></div>
-                <strong id="hero-net">¥ 0.00</strong>
+            <div class="hero-heading"><div><span class="eyebrow">PAYROLL OVERVIEW</span><h1 id="welcome-title">工资，<span>一目了然。</span></h1><p>本地分析 · 数据仅保存在此设备</p></div><div class="hero-emblem" aria-hidden="true"><img src="img/logo-first-apk.svg" alt="" width="68" height="68"></div></div>
+            <section class="summary-card" aria-label="个人月度收支概览">
+                <div class="summary-top"><label class="summary-month-label"><span>查看月份</span><select id="home-month" aria-label="选择概览月份"></select></label><span class="live-dot">本机数据</span></div>
+                <div class="summary-amount-label">工资扣除已记花销后</div>
+                <strong id="hero-net" aria-live="polite">待录入</strong>
+                <div class="summary-progress" aria-hidden="true"><span id="home-progress-fill"></span></div>
+                <p id="home-summary-note" class="summary-note">导入或录入本月工资条，开始查看收支。</p>
                 <div class="summary-divider"></div>
-                <div class="summary-stats"><div><span>应发合计</span><strong id="hero-gross">¥ 0.00</strong></div><div><span>工资记录</span><strong id="hero-records">0 条</strong></div><div><span>工资月份</span><strong id="hero-people">0 个月</strong></div></div>
+                <div class="summary-stats"><div><span>本月实发</span><strong id="hero-gross">待录入</strong></div><div><span>已记花销</span><strong id="hero-records">¥ 0.00</strong></div><div><span>工资条</span><strong id="hero-people">0 条</strong></div></div>
                 <div class="summary-glint" aria-hidden="true"></div>
             </section>
 
@@ -95,6 +98,7 @@
         <nav class="bottom-nav glass" aria-label="主导航">
             <button class="nav-item active" data-tab="home"><i data-feather="home"></i><span>概览</span></button>
             <button class="nav-item" data-tab="insights"><i data-feather="activity"></i><span>趋势</span></button>
+            <button class="quick-action" id="quick-expense-button" type="button" aria-label="快速记一笔花销"><i data-feather="plus"></i><span>记一笔</span></button>
             <button class="nav-item" data-tab="records"><i data-feather="layers"></i><span>明细</span></button>
             <button class="nav-item" data-tab="budget"><i data-feather="credit-card"></i><span>花销</span></button>
         </nav>

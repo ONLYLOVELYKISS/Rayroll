@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.dataset.themeMode = mode;
         const resolvedTheme = mode === 'system' ? (systemDark ? 'dark' : 'light') : mode;
         document.documentElement.dataset.theme = resolvedTheme;
-        document.querySelector('meta[name="theme-color"]').content = resolvedTheme === 'light' ? '#f2f4f2' : '#101215';
+        document.querySelector('meta[name="theme-color"]').content = resolvedTheme === 'light' ? '#eef2f4' : '#0d1116';
         if (byId('theme-mode')) byId('theme-mode').value = mode;
         if (chart) renderCharts();
     }
@@ -352,15 +352,29 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderOverview() {
         populateProfileSelectors();
         const records = personalRecords();
-        const totalNet = records.reduce((sum, record) => sum + Number(record.calculatedNetPay || 0), 0);
-        const totalGross = records.reduce((sum, record) => sum + Number(record.calculatedGrossPay || 0), 0);
-        const months = new Set(records.map((record) => record['月份']).filter((month) => /^\d{4}-\d{2}$/.test(month || '')));
-        byId('hero-net').textContent = state.settings.employee ? money(totalNet) : '—';
-        byId('hero-gross').textContent = state.settings.employee ? money(totalGross) : '—';
-        byId('hero-records').textContent = `${records.length} 条`;
-        byId('hero-people').textContent = `${months.size} 个月`;
-        const latestMonths = records.map((record) => record['月份']).filter((month) => /^\d{4}-\d{2}$/.test(month)).sort().reverse();
-        byId('summary-period').textContent = !state.settings.employee ? '先选择本人档案' : latestMonths.length ? `${monthLabel(latestMonths[0])} · ${state.settings.employee} · 有记录 ${months.size} 个月` : '尚无工资记录';
+        const personalExpenses = state.expenses.filter((expense) => expense.employee === state.settings.employee);
+        const availableMonths = [...new Set([currentMonth, ...records.map((record) => record['月份']), ...personalExpenses.map((expense) => expense.month)].filter((month) => /^\d{4}-(0[1-9]|1[0-2])$/.test(month || '')))].sort().reverse();
+        const homeMonth = byId('home-month');
+        if (!availableMonths.includes(state.settings.month)) state.settings.month = availableMonths[0] || currentMonth;
+        homeMonth.innerHTML = availableMonths.map((month) => `<option value="${month}">${escapeHtml(monthLabel(month))}</option>`).join('');
+        homeMonth.value = state.settings.month;
+        const monthRecords = records.filter((record) => record['月份'] === state.settings.month);
+        const salary = [...monthRecords].sort((a, b) => Number(b.updatedAt || b.createdAt || 0) - Number(a.updatedAt || a.createdAt || 0))[0];
+        const expenses = state.expenses.filter((expense) => expense.employee === state.settings.employee && expense.month === state.settings.month);
+        const spent = expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+        const income = salary ? Number(salary.calculatedNetPay ?? salary.netPay ?? 0) : 0;
+        const remaining = income - spent;
+        byId('hero-net').textContent = salary ? money(remaining) : '待录入';
+        byId('hero-net').classList.toggle('over-budget', salary && remaining < 0);
+        byId('hero-gross').textContent = salary ? money(income) : '待录入';
+        byId('hero-records').textContent = money(spent);
+        byId('hero-people').textContent = `${monthRecords.length} 条`;
+        byId('home-progress-fill').style.width = `${salary && income > 0 ? Math.min(100, Math.max(0, spent / income * 100)) : 0}%`;
+        byId('home-progress-fill').classList.toggle('over-budget', salary && spent > income);
+        byId('home-summary-note').textContent = !state.settings.employee
+            ? '请先导入工资条并选择本人档案；不同姓名不会混合统计。'
+            : salary ? (remaining < 0 ? `已记花销超过本月实发 ${money(Math.abs(remaining))}。核对账目，了解本月实际收支。` : `本月工资记录已匹配；已录花销 ${expenses.length} 笔，余额按本机账目计算。`)
+                : `${monthLabel(state.settings.month)} 暂无工资条；已记花销 ${money(spent)}，添加工资记录后即可计算余额。`;
         const recent = [...records].sort((a, b) => String(b['月份']).localeCompare(String(a['月份']))).slice(0, 4);
         byId('recent-records').innerHTML = recent.map((record) => `<button class="recent-item" data-open-records><span class="person-avatar">${escapeHtml((record.name || '薪').slice(0, 1))}</span><span class="recent-meta"><strong>${escapeHtml(record.name)}</strong><small>${escapeHtml(monthLabel(record['月份']))}${record.department ? ` · ${escapeHtml(record.department)}` : ''}</small></span><span class="recent-amount">${money(record.calculatedNetPay)}</span></button>`).join('');
         if (!recent.length) byId('recent-records').innerHTML = '<div class="empty-state">选择本人档案后，这里显示该档案的工资记录。</div>';
@@ -627,7 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } : {
             tooltip: { trigger: 'item', formatter: ({ name, value, percent }) => `${escapeHtml(name)}<br>${money(value)} · ${percent}%`, backgroundColor: styles.getPropertyValue('--panel').trim(), borderColor: lineColor, textStyle: { color: textColor, fontSize: 12 } },
             graphic: { type: 'text', left: 'center', top: 'center', style: { text: `实发\n${money(totals.net)}`, textAlign: 'center', fill: textColor, fontSize: 13, lineHeight: 22, fontFamily: 'DM Mono, sans-serif' } },
-            series: [{ type: 'pie', radius: ['48%', '74%'], center: ['50%', '48%'], avoidLabelOverlap: true, label: { show: false }, itemStyle: { borderColor: '#11151a', borderWidth: 3 }, data: [{ name: '实发工资', value: totals.net, itemStyle: { color: colors.net } }, { name: '扣款', value: totals.deduction, itemStyle: { color: colors.deduction } }] }]
+            series: [{ type: 'pie', radius: ['48%', '74%'], center: ['50%', '48%'], avoidLabelOverlap: true, label: { show: false }, itemStyle: { borderColor: styles.getPropertyValue('--panel').trim(), borderWidth: 3 }, data: [{ name: '实发工资', value: totals.net, itemStyle: { color: colors.net } }, { name: '扣款', value: totals.deduction, itemStyle: { color: colors.deduction } }] }]
         };
         chart.setOption(option);
         chart.resize();
@@ -1107,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     byId('budget-employee').addEventListener('change', async (event) => {
         state.settings.employee = event.target.value;
-        try { await saveBudgetSettings(); renderBudget(); }
+        try { await saveBudgetSettings(); refresh(); }
         catch (error) { showAppError('档案选择没有保存', error.message || '请重试。'); }
     });
     byId('insight-employee').addEventListener('change', async (event) => {
@@ -1123,7 +1137,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const today = new Date();
         const todayMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
         byId('expense-date').value = event.target.value === todayMonth ? `${todayMonth}-${String(today.getDate()).padStart(2, '0')}` : `${event.target.value}-01`;
-        try { await saveBudgetSettings(); renderBudget(); }
+        try { await saveBudgetSettings(); refresh(); }
+        catch (error) { showAppError('月份选择没有保存', error.message || '请重试。'); }
+    });
+    byId('home-month').addEventListener('change', async (event) => {
+        state.settings.month = event.target.value;
+        const today = new Date();
+        const thisMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+        byId('expense-date').value = state.settings.month === thisMonth ? `${thisMonth}-${String(today.getDate()).padStart(2, '0')}` : `${state.settings.month}-01`;
+        try { await saveBudgetSettings(); refresh(); }
         catch (error) { showAppError('月份选择没有保存', error.message || '请重试。'); }
     });
     const shiftBudgetMonth = async (delta) => {
@@ -1209,6 +1231,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (button.dataset.tab === 'insights') requestAnimationFrame(() => chart?.resize());
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }));
+    byId('quick-expense-button').addEventListener('click', () => {
+        document.querySelector('[data-tab="budget"]').click();
+        window.setTimeout(() => {
+            byId('expense-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            byId('expense-amount').focus({ preventScroll: true });
+        }, 220);
+    });
     document.querySelectorAll('[data-goto]').forEach((button) => button.addEventListener('click', () => document.querySelector(`[data-tab="${button.dataset.goto}"]`).click()));
     byId('recent-records').addEventListener('click', (event) => { if (event.target.closest('[data-open-records]')) document.querySelector('[data-tab="records"]').click(); });
     viewModeGroup.addEventListener('click', (event) => {
