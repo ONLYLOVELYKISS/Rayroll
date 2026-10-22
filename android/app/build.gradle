@@ -3,12 +3,6 @@ apply plugin: 'com.android.application'
 android {
     namespace = "com.wwhooo.skye.rayroll"
     compileSdk = rootProject.ext.compileSdkVersion
-    signingConfigs {
-        debug {
-            enableV1Signing = true
-            enableV2Signing = true
-        }
-    }
     defaultConfig {
         applicationId "com.wwhooo.Skye.RayRoll"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -23,9 +17,6 @@ android {
         }
     }
     buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
